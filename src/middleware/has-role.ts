@@ -1,20 +1,29 @@
+import { requestHasRole, sendUnauthorizedActionMsg } from '../helpers';
 import { Middleware } from './middleware-type';
 import { UserRoles } from '../models';
 import { requireAuth } from './auth';
+import { Request } from 'express';
 
-export const hasRole =
-  (...roles: UserRoles[]): Middleware =>
+const testAuth =
+  (checkFn: (r: Request) => boolean): Middleware =>
   (req, res, next) =>
-    requireAuth(req, res, () => {
-      const tokenData = req.body.tokenData;
-      if (
-        !!tokenData &&
-        !!tokenData.roles &&
-        Array.isArray(tokenData.roles) &&
-        roles.some(x => tokenData.roles.indexOf(x) > -1)
-      ) {
+    requireAuth()(req, res, () => {
+      if (checkFn(req)) {
         next();
       } else {
-        return res.unauthorized({ message: 'You are not authorized to perform this action.' });
+        return sendUnauthorizedActionMsg(res);
       }
     });
+
+export const hasRole = (...roles: UserRoles[]) => testAuth(req => requestHasRole(req, ...roles));
+
+export const hasAnyRole = (roles: UserRoles[]) => testAuth(req => roles.some(r => requestHasRole(req, r)));
+
+export const hasUserRole = () => hasRole(UserRoles.User);
+
+export const hasRootAdminRole = () => hasRole(UserRoles.RootAdmin);
+
+export const hasUserAdminRole = (includeRootAdmin = true) =>
+  testAuth(
+    req => requestHasRole(req, UserRoles.UserAdmin) || (includeRootAdmin && requestHasRole(req, UserRoles.RootAdmin))
+  );

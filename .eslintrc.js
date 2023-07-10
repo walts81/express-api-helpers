@@ -38,7 +38,7 @@ module.exports = {
       },
     ],
     eqeqeq: ['error', 'smart'],
-    'no-underscore-dangle': ['error', { allowAfterThis: true }],
+    'no-underscore-dangle': ['error', { allowAfterThis: true, allow: ['_id'] }],
   },
   ignorePatterns: ['src/**/*.spec.ts', 'src/**/*.spec.js'],
 };

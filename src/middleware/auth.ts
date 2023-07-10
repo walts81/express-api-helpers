@@ -19,7 +19,7 @@ const getAuthToken = (req: Request) => {
   return token;
 };
 
-export const requireAuth: Middleware = (req, res, next) => {
+export const requireAuth = (): Middleware => (req, res, next) => {
   const token = getAuthToken(req);
   if (!!token) {
     try {
