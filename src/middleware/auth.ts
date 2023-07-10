@@ -1,4 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
+import { Middleware } from './middleware-type';
 import { decryptToken } from '../helpers';
 
 const sendUnathorized = (res: Response) => res.unauthorized({ message: 'Invalid auth token.' });
@@ -18,7 +19,7 @@ const getAuthToken = (req: Request) => {
   return token;
 };
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const requireAuth: Middleware = (req, res, next) => {
   const token = getAuthToken(req);
   if (!!token) {
     try {

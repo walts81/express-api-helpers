@@ -1,10 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
+import { Middleware } from './middleware-type';
 import { UserRoles } from '../models';
-import { authMiddleware } from './auth';
+import { requireAuth } from './auth';
 
-export const hasRole = (...roles: UserRoles[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    return authMiddleware(req, res, () => {
+export const hasRole =
+  (...roles: UserRoles[]): Middleware =>
+  (req, res, next) =>
+    requireAuth(req, res, () => {
       const tokenData = req.body.tokenData;
       if (
         !!tokenData &&
@@ -17,5 +18,3 @@ export const hasRole = (...roles: UserRoles[]) => {
         return res.unauthorized({ message: 'You are not authorized to perform this action.' });
       }
     });
-  };
-};

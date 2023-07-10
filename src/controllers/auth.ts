@@ -1,5 +1,5 @@
 import { Router, Response } from 'express';
-import { generateToken, createUser, comparePassword } from '../helpers';
+import { generateToken, createUser, compareHash } from '../helpers';
 import { hasRole } from '../middleware';
 import { User, cleanUser, UserRoles } from '../models';
 
@@ -17,22 +17,21 @@ export const getAuthController = (
     if (!user.email) return sendRequiredMessage(res, 'Email');
     if (!user.password) return sendRequiredMessage(res, 'Password');
     const result = await createUser(user, findUserFn, insertUserFn);
-    if (typeof result === 'string') return res.badRequest({ message: result });
-    return res.ok(result);
+    return typeof result === 'string' ? res.badRequest({ message: result }) : res.ok(result);
   });
 
+  const sendInvalidLoginMessage = (res: Response) => res.badRequest({ message: 'Username or password is invalid.' });
+
   router.post('/login', async (req, res) => {
-    const error = 'Username or password is invalid.';
     const user = req.body;
     const found = await findUserFn({ username: user.username });
-    if (!found) return res.badRequest({ message: error });
-    const valid = await comparePassword(user.password, found.hash);
-    if (valid) {
-      const token = generateToken(cleanUser(found));
-      return res.ok(token);
-    } else {
-      return res.badRequest({ message: error });
-    }
+    if (!found) return sendInvalidLoginMessage(res);
+
+    const valid = await compareHash(user.password, found.hash);
+    if (!valid) return sendInvalidLoginMessage(res);
+
+    const token = generateToken(cleanUser(found));
+    return !!token ? res.ok(token) : res.serverError({ message: 'Failed to generate token.' });
   });
 
   return { path: '/auth', router };

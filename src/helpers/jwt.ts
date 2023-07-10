@@ -8,16 +8,24 @@ const getTokenConfig = () => {
 };
 
 export const generateToken = (user: Partial<User>) => {
-  const cUser = cleanUser(user);
-  const config = getTokenConfig();
-  const token = jwt.sign(cUser, config.secret, {
-    expiresIn: config.tokenExp,
-  });
-  return token;
+  try {
+    const cUser = cleanUser(user);
+    const config = getTokenConfig();
+    const token = jwt.sign(cUser, config.secret, {
+      expiresIn: config.tokenExp,
+    });
+    return token;
+  } catch {
+    return null;
+  }
 };
 
 export const decryptToken = (token: string): Partial<User> | null => {
-  const config = getTokenConfig();
-  const result: Partial<User> = jwt.verify(token, config.secret) as any;
-  return !!result.username ? result : null;
+  try {
+    const config = getTokenConfig();
+    const result: Partial<User> = jwt.verify(token, config.secret) as any;
+    return !!result.username ? result : null;
+  } catch {
+    return null;
+  }
 };

@@ -1,8 +1,6 @@
-import { NextFunction, Request, Response, Router } from 'express';
+import { Request, Response, Router } from 'express';
 import { Crud, UserRoles } from '../models';
-import { hasRole } from '../middleware';
-
-type Middleware = (req: Request, res: Response, next: NextFunction) => void;
+import { hasRole, Middleware } from '../middleware';
 
 const tryExecute = (req: Request, res: Response, action: (r1: Request, r2: Response) => Promise<any>) => {
   try {
@@ -11,7 +9,7 @@ const tryExecute = (req: Request, res: Response, action: (r1: Request, r2: Respo
     return res.serverError({ message: error });
   }
 };
-export const createControllerWithMiddlewareForRoles = <T>(
+export const createCrudControllerWithMiddlewareForRoles = <T>(
   name: string,
   path: string,
   crud: Crud<T>,
@@ -70,21 +68,21 @@ export const createControllerWithMiddlewareForRoles = <T>(
   return { path, router };
 };
 
-export const createControllerWithMiddleware = <T>(
+export const createCrudControllerWithMiddleware = <T>(
   name: string,
   path: string,
   crud: Crud<T>,
   cleanFn: (x: T) => any = x => x,
   ...middleware: Middleware[]
-) => createControllerWithMiddlewareForRoles(name, path, crud, cleanFn, middleware, []);
+) => createCrudControllerWithMiddlewareForRoles(name, path, crud, cleanFn, middleware, []);
 
-export const createControllerForRoles = <T>(
+export const createCrudControllerForRoles = <T>(
   name: string,
   path: string,
   crud: Crud<T>,
   cleanFn: (x: T) => any = x => x,
   ...roles: UserRoles[]
-) => createControllerWithMiddlewareForRoles(name, path, crud, cleanFn, [], roles);
+) => createCrudControllerWithMiddlewareForRoles(name, path, crud, cleanFn, [], roles);
 
 export const createController = <T>(name: string, path: string, crud: Crud<T>, cleanFn: (x: T) => any = x => x) =>
-  createControllerWithMiddlewareForRoles(name, path, crud, cleanFn, [], []);
+  createCrudControllerWithMiddlewareForRoles(name, path, crud, cleanFn, [], []);

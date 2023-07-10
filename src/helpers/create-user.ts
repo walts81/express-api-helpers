@@ -1,5 +1,5 @@
 import { User, cleanUser } from '../models';
-import { hashPassword } from './hash';
+import { generateHash } from './hash';
 
 export const createUser = async (
   user: Partial<User> & { password: string },
@@ -9,7 +9,7 @@ export const createUser = async (
   try {
     const found = await findUserFn({ username: user.username });
     if (!!found) return 'Username already exists.';
-    const hash = await hashPassword(user.password);
+    const hash = await generateHash(user.password);
     const newUser: Partial<User> & { password?: string } = { ...user, hash };
     delete newUser.password;
     const result = await insertUserFn(newUser);
