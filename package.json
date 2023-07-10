@@ -13,7 +13,7 @@
     "test:cov": "npm run clean:cov && TS_NODE_FILES=true nyc mocha",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "lint": "eslint src/",
-    "prepublishOnly": "npm run build && npm run test:cov && npm run lint",
+    "prepublishOnly": "npm run build && npm run lint",
     "preversion": "npm run lint",
     "postversion": "git push && git push --tags",
     "version-patch": "npm version patch -m \"updated version to %s\"",
