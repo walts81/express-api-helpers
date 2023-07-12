@@ -14,6 +14,7 @@ module.exports = {
       },
     ],
     '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-namespace': 'off',
     'array-type': 'off',
     'arrow-parens': 'off',
     'interface-name': 'off',
