@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import { Crud, UserRoles } from '../models';
-import { hasRole, Middleware } from '../middleware';
+import { hasAnyRole, hasRole, Middleware } from '../middleware';
 
 const tryExecute = (req: Request, res: Response, action: (r1: Request, r2: Response) => Promise<any>) => {
   try {
@@ -15,7 +15,8 @@ export const createCrudControllerWithMiddlewareForRoles = <T>(
   crud: Crud<T>,
   cleanFn: (a: T) => any = x => x,
   middleware: Middleware[],
-  roles: UserRoles[]
+  roles: UserRoles[],
+  anyRoles = true
 ) => {
   const router = Router();
 
@@ -23,7 +24,9 @@ export const createCrudControllerWithMiddlewareForRoles = <T>(
   const cleanFnToUse = cleanFn || (x => x);
 
   const middlewareToUse = middleware || [];
-  if (!!roles && roles.length > 0) middlewareToUse.unshift(hasRole(...roles));
+  if (!!roles && roles.length > 0)
+    if (anyRoles) middleware.unshift(hasAnyRole(roles));
+    else middlewareToUse.unshift(hasRole(...roles));
 
   pluralRoute.get(...middlewareToUse, (req, res) => {
     return tryExecute(req, res, async (_, r2) => {
@@ -83,6 +86,14 @@ export const createCrudControllerForRoles = <T>(
   cleanFn: (x: T) => any = x => x,
   ...roles: UserRoles[]
 ) => createCrudControllerWithMiddlewareForRoles(name, path, crud, cleanFn, [], roles);
+
+export const createCrudControllerForAnyRoles = <T>(
+  name: string,
+  path: string,
+  crud: Crud<T>,
+  cleanFn: (x: T) => any = x => x,
+  ...roles: UserRoles[]
+) => createCrudControllerWithMiddlewareForRoles(name, path, crud, cleanFn, [], roles, true);
 
 export const createController = <T>(name: string, path: string, crud: Crud<T>, cleanFn: (x: T) => any = x => x) =>
   createCrudControllerWithMiddlewareForRoles(name, path, crud, cleanFn, [], []);
