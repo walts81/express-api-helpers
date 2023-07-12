@@ -1,12 +1,12 @@
 {
   "name": "@walts81/express-api-helpers",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "dev": "ts-node src/index",
-    "build": "npm run clean && tsc && cp -R src/_types lib/types",
+    "build": "npm run clean && tsc",
     "clean": "rimraf lib",
     "clean:cov": "rimraf coverage",
     "test": "TS_NODE_FILES=true mocha",

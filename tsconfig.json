@@ -24,8 +24,7 @@
     "allowJs": true,
     "lib": ["dom", "es2015", "es2015.promise"],
     "skipLibCheck": true,
-    "typeRoots": ["./src/_types", "./node_modules/@types"]
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   },
-  "include": ["src/**/*.ts", "src/_types/*.d.ts"],
   "exclude": ["node_modules", "src/**/*.spec.ts", "src/**/*.spec.js", "lib/**/*.ts", "lib/**/*.js", "coverage"]
 }
